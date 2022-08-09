@@ -1,0 +1,58 @@
+# picking on stacked section or velocity model
+
+echo 'the vfile has been copied in vfile_withoutVgradient'
+cp vfile vfile_withoutVgradient
+
+echo "migration and velocity parameters:"
+echo " "
+echo "nz,dz,fz?"
+read nz
+read dz
+read fz
+
+echo "nx,dx,fx?"
+read nx
+read dx
+read fx
+
+	ok=false
+	while [ $ok = false ]
+	do
+
+suximage <stackPSDM.su perc=98 mpicks=picking_stack &
+
+ximage <vfile n1=$nz d1=$dz f1=$fz d2=$dx f2=$fx legend=1 mpicks=picking_velocity &  
+
+echo "Close velocity model and stacked section windows"
+pause
+
+		echo -n "Picks OK? (y/n) " >/dev/tty
+		read response
+		case $response in
+		n*) ok=false ;;
+		*) ok=true ;;
+		esac
+
+	done </dev/tty
+
+set +x
+
+./../preparepicks
+
+echo 'the last horizon (horizon.dat) has been created'
+
+b2a <vfile n1=1 >vfile.a1
+
+./../insertvelgrad
+
+a2b <vfile.dat n1=1 >vfile
+
+echo "the new vfile has been updated"
+
+awk '{print $2,$1}' horizon.dat >horizon_pick.dat
+
+ximage <vfile n1=$nz d1=$dz f1=$fz d2=$dx f2=$fx legend=1 curve=horizon_pick.dat npair=$nx &
+
+suximage <stackPSDM.su perc=98 curve=horizon_pick.dat npair=$nx &
+
+rm -f vfile.a1 vfile.dat

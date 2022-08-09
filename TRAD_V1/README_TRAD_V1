@@ -1,0 +1,131 @@
+﻿ISTRICI-TRAD_V1 MANUAL: Software for the geological inversion of seismic data by using CIG analysis
+
+Produced by Umberta Tinivella and Michela Giustiniani (OGS)
+
+Please, after dowoading the software, write to utinivella@ogs.it and mgiustiniani@ogs.it to inform about it.
+Please, cite ISTRICI and acknowledge the authors in the scientific products in which ISTRICI has been used.
+
+TRAD_V1 is a software based on SU and fortran codes to determine seismic velocity by using Common Image Gather (CIG) analysis.
+
+For more details about the Seismic Unix (SU) command and adopted algorithms, you can see the SU help, just typing the name of the command.
+
+The list of available command can be visualised typing "suhelp" or "suname".
+
+Please, consulte ximage and suximage help in order to know as to perform the picking!
+
+
+-----------------
+First of all, copy the TRAD_V1 directory in the directory where the analysis will be performed
+
+-----------------
+Then, you need to create the Seimic Unix file, by using, for example, the following commands:
+
+segyread tape=file.sgy endian=0 conv=1 | segyclean >file.su
+
+-----------------
+Check if the coordinates (trace header sx and gx) are stored in the SU file. If not, you can use the sushw command, such as:
+
+sushw <file.su key=sx,offset a=XX,xx b=0,xx c=XX,0 j=XX,xx | suchw key1=gx key2=sx key3=offset a=0 b=1 c=1 >file_coo.su
+
+or
+
+suchw <file.su key1=sx key2=fldr a=XX b=XX | suchw key1=gx key2=sx key3=offset a=0 b=1 c=1 >file_coo.su
+
+Remove not necessary headers in the su file
+
+-----------------
+Create the initial vfile, the binary velocity field with constant velocity. 
+In this step, you need to decide the geometry parameters of the grid: nx,dx,nz,dz
+
+Input: nx,nz,constant velocity
+
+sh TRAD_V1/CreateVfile
+
+Output: vfile, given filename for the initial vfile
+
+-----------------
+1. Perform the Pre-stack Depth Migration and create the stacked migrated section
+
+Input: vfile, seismic data
+
+sh TRAD_V1/PerformPSDM
+
+Output: kd.data_complete (migration), outfile1_complete (additional migration), stackPSDM.su (stack of the CIGs)
+
+-----------------
+2. Extraction of selected CIGs to perform the velocity analysis
+In this step, you decide the CIG step for the velocity analysis.
+
+Input: kd.data_complete (migration), outfile1_complete (additional migration)
+
+sh TRAD_V1/CIGextraction
+
+Output: kd.data, outfile1
+
+The output files are used to perform the velocity analysis.  
+
+----------------
+3. Update of velocity field (vfile) by using CIG analysis
+
+
+sh TRAD_V1/UPDATEvelocity 
+
+Output: updated vfile
+
+Suggestion: change the name of the updated vfile!
+Note that the old files are saved in filename_old
+
+In the case of marine seismic data, it could be necessary to fix the seawater velocity (previusly obtained by using INTER box, for example), 
+to perform the velocity analysis. It possibile to use:
+
+Input: horizon.dat (depth of seafloor picked on final Pre-stacked migrated section obtained with INTER).
+
+sh TRAD_V1/UPDATEvelocity2marinedata
+
+Output: updated vfile
+
+-----------------
+
+REPEATE the steps 1-3 until you obtain a satisfactory velocity field. When you decide that the velocity model for the whole line is satisfactory, you perform the last pre-stack depth migration (step 68). Before performing the last migration, a velocity gradient can be inserted (step 57). 
+
+-----------------
+4. Insert a velocity gradient below a chosen surface
+
+input: vfile, velocity gradient, horizon from where the gradient is inserted.
+
+sh TRAD_V1/InsertVelocityGradient
+
+Output: new vfile
+
+Suggestion: change the name of the new vfile
+
+-----------------
+5. Smooth the vfile and perform the final pre-stack depth migration
+kd.data_complete
+Input: vfile and its parameters, seismic data 
+
+sh TRAD_V1/PerformLastPSDM
+
+Output: vfile_smooth, kd.data_complete, stackFinalPSDM.su 
+
+Suggestion: you can improve the final stacked section by using only selected offset in the CIG to create a stacked section. 
+
+-----------------
+
+GENERAL SUGGESTION: in order to remember the adopted parameters, it is possible to create a input file information.
+
+---------------------
+6. Merge the velocity model obtained with TRAD_V1 box with that one obtained with CIG_V1 or INTER_V1 boxes.
+This step allows inserting layers attributing them a mean velocity.
+
+Input: chosen vfile, stackFPSDM.su
+
+sh VEL2Layer
+
+Output: new vfile
+
+
+
+
+
+

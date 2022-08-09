@@ -1,0 +1,302 @@
+#echo "insert the filenames of the top and the bottom of the layer"
+#read filetop
+#read filebot
+#echo " "
+
+#cp $filebot tmp
+#awk '{print $1,$2=$2-$2}' tmp >vfile_a.corr
+#rm tmp
+
+echo "migration and velocity parameters:"
+echo " "
+echo "nz,dz,fz?"
+read nz
+read dz
+read fz
+
+echo "nx,dx,fx?"
+read nx
+read dx
+read fx
+
+echo "near offset (absolute value in m) in the CIGs (kd.data and outfile1)"
+read absoff0
+echo "number of offsets in the CIGs"
+read noff
+echo "offset increment (absolute value) in the CIGs"
+read doff
+
+echo "min, max and CIG step at which you want to performe the velocity analyis"
+echo "Attention: the step must be a multiple of the step used in the CIGextraction!"
+read cdpmin
+read cdpmax
+read dcdp
+
+echo "insert the values: ns, d1 e d2 in the trace header of the kd.data"
+read nzmig
+read dzmig
+read d2mig
+
+rm -f mpick.dat
+rm -f residuotot.dat
+rm -f deltap.txt
+
+cp vfile vfile_old
+#cp $filebot $filebot.old
+
+#! /bin/sh
+set -v
+
+b2a <vfile n1=1 >vfile.a
+#cp vfile.a vfile.corr
+#cp vfile.a vfile.aold
+
+# Residual moveout analyses for the cip gathers
+# residual moveout is represented by z(h)^2 = z(0)^2+r*h^2
+# 	where h is half an offset
+# Authors: Zhenyue
+# NOTE: Comment lines preceeding user input start with  ##
+#set -x
+
+
+#echo $filetop >input_oriz
+#echo $filebot >>input_oriz
+
+#awk '{print $1,0}' $filebot >vfile_a.corr
+
+## Set parameters
+input=kd.data
+rpicks=res.p1
+fold=$noff
+
+## Set r-parameter sampling
+######################################nr=1001 dr=0.001 fr=-0.5
+nr=51 dr=0.01 fr=-0.25
+dzratio=2
+
+## Do the residual moveout analyses.
+echo 
+echo "Pick r-parameters by moving mouse and typing 's', type 'Q' when done"
+echo 
+echo "Use the plot from Xmig as a guide to picking"
+
+cdp=$cdpmin
+
+rm -f picking_cig
+
+while [ $cdp -le $cdpmax ]
+do
+
+	ok=false
+	while [ $ok = false ]
+	do
+
+#echo -n "x1end=" >xmax1
+#awk '{print $2=$2+400.}' $filebot | sort | tail -1 >>xmax1
+#	echo -n "title='CIG e Z =" >> xmax1
+#        grep $cdp $filebot >>xmax1
+#        echo -n "'" >> xmax1
+#
+#cat xmax1
+#
+#rm -f xmax1
+#echo -n "f1=" >xmax2
+#awk '{print $1,$2=$2-400.}' $filebot | grep $cdp | awk '{print $2}' >>xmax2
+
+#echo -n "tmin=" >xmin
+#echo -n "tmax=" >xmax
+#awk '{print $1,$2=$2/1000.-.4}' $filebot | grep $cdp | awk '{print $2}' >>xmin
+#awk '{print $1,$2=$2/1000.+.4}' $filebot | grep $cdp | awk '{print $2}' >>xmax
+#cat xmin xmax >image.par
+
+		echo "Starting Residual moveout analysis for cip $cdp"
+
+		suwind <$input key=cdp min=$cdp max=$cdp >tmp.su
+
+	        suxwigb	<tmp.su perc=98 \
+		label1="Depth (m)" label2="Offset (m)"\
+		title="CIG $cdp" key=offset wbox=700 hbox=500 & 
+      		
+    surelan <tmp.su dzratio=$dzratio nr=$nr dr=$dr fr=$fr |\
+   suchw key1=dt key2=d1 b=1000 >filecigtot.su
+		
+		suwind <filecigtot.su key=cdp min=$cdp max=$cdp | 
+		suximage perc=97 f2=$fr d2=$dr \
+			label1="Depth (m)" label2="r-parameter " \
+			title="r-parameter Scan for CIP $cdp" \
+			grid1=solid grid2=solid  \
+			mpicks=mpicks.$cdp cmap=hsv2 wbox=700 hbox=1100
+      
+		pause
+
+		echo -n "Picks OK? (y/n) " >/dev/tty
+		read response
+		case $response in
+		n*) ok=false ;;
+		*) ok=true ;;
+		esac
+
+	done </dev/tty
+
+set +x
+
+# determine depth derivatives from ratios from two migration outputs
+nxx=1  
+############################## nxw=2 nzw=2
+nxw=0
+nzw=0
+
+suwind<kd.data key=cdp max=$cdp min=$cdp >dati_tmp
+susort <dati_tmp -offset |sustrip >infile
+suwind<outfile1 key=cdp min=$cdp max=$cdp >dati_tmp 
+<dati_tmp susort -offset | sustrip >afile
+
+### Combine the individual picks into a composite par file
+echo "Editing pick files ..."
+
+echo -n "$cdp," >>picking_cig
+cat  mpicks.$cdp >>picking_cig
+
+#numero di picking
+echo "How many picks in this CIG? (wc mpicks.numeroCDP)"
+read numeropick
+echo $cdp,$numeropick >numeropick.txt
+
+#ATTENZIONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+>$rpicks
+	echo -n "cip=$cdp," >temp
+	cat temp mpicks.$cdp>>$rpicks
+
+sed "s/  /,/g"<$rpicks >cig.par
+
+echo -n "$cdp " >corr
+sed "s/  / /g"<mpicks.$cdp >>corr
+
+awk '{print $3,$1}' corr >>mpick.dat
+
+cp cig.par cig.par.$cdp
+
+echo "dzdv par file: cig.par is ready"
+
+### Clean up
+#rm mpicks.$cdp 
+rm temp $rpicks
+
+# determine depth derivatives from ratios from two migration outputs
+#set -x
+
+cp mpicks.$cdp mpicks.txt
+
+rm -f deltap.txt
+
+iciclo=1
+while [ $iciclo -le $numeropick ]
+do
+
+#fai il cig.par
+echo $iciclo >nciclo.txt
+echo $cdp >>nciclo.txt
+./../faicigpar
+sed "s/ //g" cig.txt >cig.par
+####################
+
+> dzfile \
+dzdv <infile par=cig.par nx=1 nz=$nzmig fx=$cdp fz=$fz dx=$d2mig dz=$dzmig \
+ afile=afile dfile=dfile \
+ off0=$absoff0 noff=$noff doff=$doff nxw=$nxw nzw=$nzw
+
+#
+echo "Add the value of dlambda to the original velocity to obtain new velocity"
+
+# estimate velocity parameter perturbation from covariance of imaged
+# depths
+
+rm -f dati_tmp
+
+velpert<dfile dzfile=dzfile ncip=1 noff=$noff moff=$noff  \
+>deltap.$cdp 
+
+#
+# update the velocity by using lambda
+#
+
+echo -n "$nz $dz $fz $nx $dx $fx" >tmp
+
+#
+sed "2,3d" deltap.$cdp >deltap.tmp 
+
+awk '{print $6}' deltap.tmp >>deltap.txt
+
+ iciclo=`bc -l <<END
+	                $iciclo + 1
+END`
+
+rm dzfile
+
+done
+###################################
+
+#
+./../aggiungilambda
+cp residuo.txt residuo.$cdp
+cat residuo.txt >>residuotot.dat
+rm -f deltap.txt
+
+# vel residua
+echo $nz >v.par
+echo $dz >>v.par
+echo $fz >>v.par
+echo $nx >>v.par
+echo $dx >>v.par
+echo $fx >>v.par
+echo $cdpmin >>v.par
+echo $cdpmax >>v.par
+echo $dcdp >>v.par
+
+./../faivelres
+a2b <velres.dat n1=1 >velres.bin
+
+ximage <velres.bin n1=$nz d1=$dz n2=$nx d2=$dx f2=$fx legend=1 &
+
+#
+
+#echo "if you want, you can change lambda in the file deltap.txt"
+#pause
+
+########################à
+#bisogna usare anche mpicks.$cdp
+#
+
+./../sommavel
+
+a2b <vfile.updated n1=1 >vfile_updated
+
+cp vfile_updated vfile
+
+echo "the residual velocity has been created (velres.bin)"
+echo "the velocity has been updated (vfile_updated and vfile)"
+
+rm tmp
+
+#a2b <vfile.a1 n1=1 >vfile
+#mv vfile.a1 vfile.a
+#mv vfile_a.corr1 vfile_a.corr
+#mv vfile.corr1 vfile.corr
+
+        cdp=`bc -l <<END
+	                $cdp + $dcdp
+END`
+
+done
+
+#rm -f deltap.* cig.par* xmin xmax image.par xmax1 xmax2 corr 
+#interpolation of velocity grid correction'
+rm -f tmp
+
+#a2b <vfile.a1 >vfile n1=1
+
+rm -f input_oriz
+
+rm -f vfile.a1 vfile.a vfile_a.corr1 vfile_a.corr vfile.aold vfile.corr
+
+exit 0

@@ -1,0 +1,68 @@
+        program preparepicks
+        dimension p(10000,2),pn(10000)
+
+        open(10,file='v.par')
+        read(10,*) nz
+        read(10,*) dz
+        read(10,*) fz
+        read(10,*) nx
+        read(10,*) pcdp
+        read(10,*) cdp1
+        read(10,*) ncdpmin
+        read(10,*) ncdpmax
+        read(10,*) ncdp
+        close(10)
+        cdp2=cdp1+(nx-1)*pcdp
+
+        print*,
+     $'Did you pick velocity model (1) or stacked section (2)?'
+        read*, nopt
+
+        if(nopt.eq.1) then
+         open(10,file='picking_velocity')
+        else
+         open(10,file='picking_stack')
+        endif
+
+         open(11,file='horizon.dat')
+
+        i=1
+ 10     read(10,*,end=99) p(i,2),p(i,1)
+        i=i+1
+        goto 10
+ 99     n=i-1
+        close(10)
+      
+c        print*, 'insert x initial (fx), x final and dx'
+c        print*, '(in agreement with the vfile parameters)'
+c        read*, cdp1,cdp2,pcdp
+
+        ncdp=(cdp2-cdp1)/pcdp+1
+
+        do i=1,ncdp
+         cdp=cdp1+(i-1)*pcdp
+         if(cdp.le.p(1,1)) then
+          pn(i)=p(1,2)
+          goto 20
+         endif
+         if(cdp.ge.p(n,1)) then
+          pn(i)=p(n,2)
+          goto 20
+         endif
+         do j=1,n-1
+          if(cdp.ge.p(j,1).and.cdp.le.p(j+1,1)) then
+           x=(p(j+1,2)-p(j,2))/(p(j+1,1)-p(j,1))
+           pn(i)=x*(cdp-p(j,1))+p(j,2)
+           goto 20
+          endif
+         enddo
+         print*, 'error',cdp
+
+ 20      write(11,*) cdp,pn(i)     
+        enddo    
+
+         close(10)
+         close(11)
+
+         stop
+         end

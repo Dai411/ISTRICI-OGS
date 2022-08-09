@@ -1,0 +1,71 @@
+# traslate the velocity in terms of layer velocity
+
+echo "Migration paramenter nx?"
+read nx
+
+echo "How many reflectors do you want to interpret?"
+read nref
+
+echo $nref >nref.txt
+
+rm -f horizon_tot.dat
+
+rm -f horizon_pick.dat
+
+iciclo=1
+while [ $iciclo -le $nref ]
+do
+
+	ok=false
+	while [ $ok = false ]
+	do
+
+echo "Picks the horizon number:"
+echo $iciclo
+
+suximage <stackPSDM.su perc=98 mpicks=picks.dat 
+
+		echo -n "Picks OK? (y/n) " >/dev/tty
+		read response
+		case $response in
+		n*) ok=false ;;
+		*) ok=true ;;
+		esac
+
+	done </dev/tty
+
+set +x
+
+./../preparepicksxvel
+
+cp horizon.dat horizon.$iciclo
+cat horizon.dat >>horizon_tot.dat
+
+echo "check the interpolation result"
+awk '{print $2,$1}' horizon.dat >horizon_pick.dat
+cp horizon_pick.dat horizon_pick.$iciclo
+suximage <stackPSDM.su curve=horizon_pick.dat npair=$nx perc=98 &
+
+pause
+
+iciclo=`bc -l <<END
+	                $iciclo + 1
+END`
+
+done
+
+#end of interpretation
+# create the velocity model on the base of the interpretation
+
+echo 'the velocity model used as input is vfile'
+
+b2a <vfile n1=1 >vfile.a1
+
+./../vel2layer
+
+a2b <vfile_layer.dat n1=1 >vfile_layer
+
+echo "The vfile_layer has been created"
+
+echo "The files horizon_pick.number_of_reflector can be visualized in the stacked section"
+

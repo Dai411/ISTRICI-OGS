@@ -1,0 +1,6 @@
+../makevfile  
+echo "insert the name of initial vfile"
+read vfile
+a2b <vfile.dat n1=1 >$vfile
+cp $vfile vfile
+rm -f vfile.dat

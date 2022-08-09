@@ -1,0 +1,26 @@
+echo 'Check the file v.par (nz,dz,fz,nx,dx,fx,cdpmin,cdpmx,dcdp)'
+echo 'Eventually update v.par'
+pause
+
+./../faivelres2marinedata_dettaglio
+a2b <velres.dat n1=1 >velres.bin
+
+ximage <velres.bin par=par_velres legend=1 &
+
+#
+
+#echo "if you want, you can change lambda in the file deltap.txt"
+#pause
+
+./../sommavel
+
+a2b <vfile.updated n1=1 >vfile_updated
+
+cp vfile_updated vfile
+
+echo "the residual velocity has been created (velres.bin)"
+echo "the velocity has been updated (vfile_updated and vfile)"
+
+rm -f residuotot.dat vfile.a
+
+exit 0
