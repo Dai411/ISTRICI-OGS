@@ -1,0 +1,78 @@
+echo "insert the limit coordinates of the model"
+echo " "
+read xini
+read xfin
+echo $xini 0 >input_unif
+echo $xfin 0 >>input_unif
+echo 1.0 -99999 >>input_unif
+
+echo "insert parameter r1 and r2 to apply the smooth of vfile"
+read r1
+read r2
+
+echo "tfile parameters:"
+echo " "
+echo "time information for the ray tracing: nt, dt (s)?"
+read nt
+read dt
+echo "shot information: ns, ds, fs"
+echo "suggestion: ns=nx/2 ds=2*dx fs=fx"
+read ns
+read ds
+read fs
+echo " "
+
+echo "vfile parameters:"
+echo " "
+echo "nz,dz,fz?"
+read nz
+read dz
+read fz
+echo "nx,dx,fx?"
+read nx
+read dx
+read fx
+echo " "
+
+echo "migration parameters:"
+echo " "
+echo "absolute offset maximum"
+read offmax
+echo "sampling interval of mid points (trace header d2)" 
+read dxm
+echo "far offset in CIG output (in m with the sign)"
+read off0
+echo "offset increment in CIG output (in m with the sign)"
+read doff
+echo "number of offsets in CIG output"
+read noff
+echo "maximum number of input traces to be migrated (equal or grater than the number trace in the seismic data)"
+read ntr
+echo " "
+echo "input SU seismic data"
+read inputsu
+
+smooth2 <vfile n1=$nz n2=$nx r1=$r1 r2=$r2 >vfile_smooth
+
+echo "the file vfile_smooth has been created"
+pause
+
+unif2 <input_unif >pvfile  ninf=0  npmax=201 nz=$nz\
+ dz=$dz fz=$fz nx=$nx dx=$dx fx=$fx v00=1
+
+rayt2d <vfile_smooth nt=$nt dt=$dt fz=$fz nz=$nz dz=$dz fx=$fx nx=$nx dx=$dx\
+ fxo=$fx nxo=$nx dxo=$dx fzo=$fz nzo=$nz dzo=$dz fxs=$fs nxs=$ns dxs=$ds \
+ verbose=1 npv=0 tfile=tfile
+
+<$inputsu sukdmig2d offmax=$offmax dxm=$dxm >kd.data_complete fzt=$fz nzt=$nz dzt=$dz fxt=$fx nxt=$nx dxt=$dx\
+ fs=$fs ns=$ns ds=$ds ntr=$ntr off0=$off0 noff=$noff doff=$doff ttfile=tfile \
+ verbose=1 npv=0 
+
+sustack <kd.data_complete >stackFinalPSDM.su
+
+echo " the migration outputs are: kd.data_complete and stackFinalPSDM.su"
+
+rm -f input_unif tfile 
+
+exit 0
+

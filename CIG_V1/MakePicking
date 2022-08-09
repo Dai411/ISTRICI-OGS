@@ -1,0 +1,13 @@
+suximage <stackPSDM.su perc=98 mpicks=picks.dat
+
+echo "the file picks.dat has been created"
+
+./ISTRICI/preparepicks
+
+echo "the file horizon.dat had been created" 
+
+echo "check the interpolation result"
+awk '{print $2,$1}' horizon.dat >horizon_pick.dat
+wc horizon_pick.dat | sed -e 's/\ /npair=/' >tmp
+suximage <stackPSDM.su perc=98 curve=horizon_pick.dat par=tmp 
+rm -f tmp
