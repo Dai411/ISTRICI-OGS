@@ -1,0 +1,20 @@
+echo "input files: kd.data_complete, outfile1_complete (after PerformPSDM)"
+pause
+
+echo "insert the firt cdp to extract and the step"
+read cdpin
+read step
+
+# KD.DATA
+
+sushw <kd.data_complete key=trid a=1 b=0 | suchw key1=dt key2=d1 b=1000 | \
+suwind key=cdp min=$cdpin |suwind j=$step key=cdp >kd.data
+
+# DATAOUT
+
+sushw <outfile1_complete key=trid a=1 b=0 | suchw key1=dt key2=d1 b=1000 | \
+suwind key=cdp min=cdpin |suwind j=$step key=cdp >outfile1
+
+echo "the outfile1 and kd.data have been created"
+
+exit 0
