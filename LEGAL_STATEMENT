@@ -1,0 +1,58 @@
+This file is property of the National Institute of Oceanography and Applied Geophysics - OGS.
+
+Copyright © 2022, National Institute of Oceanography and Applied Geophysics - OGS,
+All rights reserved.
+
+
+Redistribution and use in source and binary forms, with or 
+without modification, are permitted provided that the following 
+conditions are met:
+
+    *  Redistributions of source code must retain the above copyright 
+       notice, this list of conditions and the following disclaimer.
+    *  Redistributions in binary form must reproduce the above 
+       copyright notice, this list of conditions and the following 
+       disclaimer in the documentation and/or other materials provided 
+       with the distribution.
+    *  Neither the name of the National Institute of Oceanography and Applied Geophysics - OGS nor the names of
+       its contributors may be used to endorse or promote products 
+       derived from this software without specific prior written permission.
+
+Warranty Disclaimer:
+THIS SOFTWARE IS PROVIDED BY THE NATIONAL INSTITUTE OF OCEANOGRAPHY AND APPLIED GEOPHYSICS - OGS 
+AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
+NATIONAL INSTITUTE OF OCEANOGRAPHY AND APPLIED GEOPHYSICS - OGS OR CONTRIBUTORS BE LIABLE 
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING 
+IN ANY WAY OUT OF THE USE OF THIS PACKAGE, EVEN IF ADVISED OF THE 
+POSSIBILITY OF SUCH DAMAGE.
+
+
+Export Restriction Disclaimer:
+We believe the OGS/ISTRICI: ISTRICI is a low technology product that does
+not subject to export restrictions of any variety.
+
+Approved Reference Format:
+In publications, please refer to ISTRICI as per the following example:
+Umberta Tinivella and Michela Giustiniani (2022), ISTRICI - STRUCTURAL INVERSION OF COMMON IMAGE GATHERS 
+Submitted to Computers & Geosciences.
+
+Articles in which ISTRICI was used in peer-reviewed journals:
+1. Loreto, M.F., Tinivella, U., 2012. Gas hydrate versus geological features: The South Shetland case study. Marine and Petroleum Geology 36(1), 164-171
+2. Loreto, M.F., Tinivella, U., Accaino, F., Giustiniani, M., 2011. Gas hydrate reservoir characterization by geophysical data analysis (offshore Antarctic Peninsula). Energies 4, 39-56.
+3. Tinivella, U., Loreto, M.F., Accaino, F., 2009. Regional versus detailed velocity analysis to quantify hydrate and free gas in marine sediments: The South Shetland margin case study. Geological Society Special Publication 319, 103i-119.
+4. Vargas-Cordero, I., Tinivella, U., Accaino, F., Loreto, M.F., Fanucci, F., 2010a.i Thermal state and concentration of gas hydrate and free gas of Coyhaique, Chilean Margin (44 degree 30' S). Marine and Petroleum Geology, 2010, 27(5), pp. 1148-1156
+5. Vargas-Cordero, I., Tinivella, U., Accaino, F., Loreto, M.F., Fanucci, F., Reichert, C., 2010b. Analyses of bottom simulating reflections offshore Arauco and Coyhaique (Chile). Geo-Marine Letters 30(3-4), 271-281 
+6. Vargas-Cordero, I.C., Tinivella, U., Villar-Munoz, L., Giustiniani, M., 2016. Gas hydrate and free gas estimation from seismic analysis offshore Chiloe' island (Chile). Andean Geology 43(3), 263-274
+7. Vargas-Cordero, I.C., Tinivella, U., Villar-Munoz, L., 2017. Gas hydrate and free gas concentrations in two sites inside the Chilean margin (Itata and Valdivia offshores). Energies 10(12), Article number 2154.
+8. Vargas-Cordero, I.C., Tinivella, U., Villar-Munoz, L., Bento, J.P., 2018. High gas hydrate and free gas concentrations: An explanation for seeps offshore south mocha island. Energies 11(11)
+9. Villar-Munoz, L., Bento, J.P., Klaeschen, D., Tinivella, U., Vargas-Cordero, I., Behrmann, J., 2018. A first estimation of gas hydrates offshore Patagonia (Chile). Marine and Petroleum Geology 96, 232-239
+10. Villar-Munoz, Vargas-Cordero, I., L., Bento, J.P., Tinivella, U., Fernandoy, F., Giustiniani, M., Behrmann, J., Calderon-Diaz, S., 2019. Gas Hydrate Estimate in an Area of Deformation and High Heat Flow at the Chile Triple Junction. Geosciences 9(11), Article number 28 
+
+Acknowledgements:
+ISTRICI stands for "STRUCTURAL INVERSION OF COMMON IMAGE GATHERS" package developed at National Institute of Oceanography and Applied Geophysics - OGS by Umberta Tinivella and Michela Giustiniani.
