@@ -1,0 +1,177 @@
+ISTRICI/preparapickior
+
+# nome dei file degli orizzonti
+echo "dimmi i nomi dei file top e bottom dello strato"
+read filetop
+read filebot
+
+cp $filebot tmp
+awk '{print $1,$2=$2-$2}' tmp >vfile_a.corr
+rm tmp
+
+echo "dimmi: nz, dz,fz"
+read nz
+read dz
+read fz
+
+echo "dimmi: nx, dx, fx"
+read nx
+read dx
+read fx
+
+echo "dimmi: offset iniziale, numero di offset, passo (m)"
+read off0
+read noff
+read doff
+
+echo "dimmi: valore assoluto offset iniziale"
+read absoff0
+
+echo "dimmi: cig minimo, massimo e passo per analisi"
+read cdpmin
+read cdpmax
+read dcdp
+
+cp vfile vfile_old
+cp $filebot $filebot.old
+
+#! /bin/sh
+set -v
+
+b2a <vfile n1=1 >vfile.a
+cp vfile.a vfile.corr
+cp vfile.a vfile.aold
+
+echo $filetop >input_oriz
+echo $filebot >>input_oriz
+
+awk '{print $1,0}' $filebot >vfile_a.corr
+
+## Set parameters
+input=kd.data
+rpicks=res.p1
+fold=$noff
+
+## Set r-parameter sampling
+nr=1001 dr=0.001 fr=-0.5
+dzratio=2
+
+cdp=$cdpmin
+
+rm -f mpick.dat
+
+echo 'controlla....'
+pause
+
+while [ $cdp -le $cdpmax ]
+do
+
+set +x
+
+rm -f corr
+
+### Combine the individual picks into a composite par file
+echo "Editing pick files ..."
+
+grep $cdp pick_or.dat >$rpicks
+
+sed "s/  /,/g"<$rpicks >ttt    
+sed "s/ /,/g" ttt >cig.par
+
+grep $cdp mpicks_or.dat >mpicks.$cdp
+
+#echo -n "$cdp " >corr
+sed "s/  / /g"<mpicks.$cdp >>corr
+
+awk '{print $3,$1}' corr >>mpick.dat
+
+cp cig.par cig.par.$cdp
+
+echo "dzdv par file: cig.par is ready"
+
+### Clean up
+rm mpicks.$cdp 
+rm $rpicks
+
+# determine depth derivatives from ratios from two migration outputs
+#set -x
+
+ nxx=1    
+ nxw=0 nzw=0
+
+#echo "dimmi offset minimo per il cdp corrente"
+#read minoff
+#echo "dimmi numero di offset"
+#read noff
+
+minoff=$off0
+
+suwind<kd.data key=cdp max=$cdp min=$cdp |sushw key=trid a=1 | suwind key=offset min=$minoff >tmp1.su
+<tmp1.su susort -offset |sustrip>infile 
+suwind<dataout1 key=cdp min=$cdp max=$cdp | sushw key=trid a=1 | suwind key=offset min=$minoff >tmp1.su
+<tmp1.su  susort -offset | sustrip>afile 
+
+> dzfile \
+dzdv <infile par=cig.par nx=$nxx nz=2251 fx=$cdp fz=$fz dx=12.5 dz=2 \
+ afile=afile dfile=dfile  \
+ off0=$absoff0 noff=$noff doff=$doff nxw=$nxw nzw=$nzw
+
+#> dzfile \
+#dzdv <infile par=cig.par nx=$nxx nz=2251 fx=$cdp fz=$fz dx=12.5 dz=2 \
+# afile=afile dfile=dfile  \
+# off0=-150 noff=$noff doff=-50 nxw=$nxw nzw=$nzw
+
+echo "Add the value of dlambda to the original velocity to obtain new velocity"
+
+# estimate velocity parameter perturbation from covariance of imaged
+# depths
+
+velpert<dfile dzfile=dzfile ncip=1 noff=$noff moff=$noff  \
+>deltap.$cdp 
+
+#
+# correggo la griglia con lambda
+#
+
+echo -n "$nz $dz $fz $nx $dx $fx" >tmp
+
+SCRIPTS/correggigriglia
+
+echo 'griglia corretta: controlla!'
+
+rm tmp
+
+a2b <vfile.a1 n1=1 >vfile
+mv vfile.a1 vfile.a
+mv vfile_a.corr1 vfile_a.corr
+mv vfile.corr1 vfile.corr
+
+        cdp=`bc -l <<END
+	                $cdp + $dcdp
+END`
+
+done
+
+# rm -f deltap.* cig.par* xmin xmax image.par xmax1 xmax2 corr 
+
+echo 'interpolo la griglia delle correzzioni'
+echo -n "$nz $dz $fz $nx $dx $fx" >tmp
+
+pause
+
+SCRIPTS/interpologriglia_or_new
+awk '{print $1,$2}' oriznew >$filebot
+
+echo 'fine interpolazione griglia: controlla!'
+pause
+
+#rm tmp
+#mv vfile.a1 vfile.a
+
+a2b <vfile.a1 >vfile n1=1
+psimage <vfile n1=$nz >tmp.ps
+gv tmp.ps
+
+#rm -f input_oriz
+
+exit 0

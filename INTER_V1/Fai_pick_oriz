@@ -1,0 +1,14 @@
+echo "dimmi: cig minimo e passo"
+read cdpmin
+read dcdp
+
+## Set r-parameter sampling
+dr=0.001 fr=-0.5
+
+#echo "dimmi il numero di coppie di picking"
+#read npair
+npair=2
+
+suximage perc=99.8 mpicks=mpick.dat f2=$cdpmin d2=$dcdp f1=$fr d1=$dr <filecig.su label2="CIG" label1="r-parameter" grid1=solid grid2=solid cmap=hsv2 wbox=700 hbox=200 
+
+exit 0
