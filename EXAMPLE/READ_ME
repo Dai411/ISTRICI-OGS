@@ -1,0 +1,7 @@
+The file vfile1500 is the initial velocity field in binary format. To visualize the file:
+ximage < vfile1500 n1=201 n2=921 d2=50 d1=25 legend=1
+
+Shot_sx4800 file is the raw seismic data of one shot. 
+
+CIG4800 is the Common Image Gather resulting from the application of the INTER and TRAD modules, as described in the paper.
+ 
