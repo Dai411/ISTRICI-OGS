@@ -5,7 +5,8 @@ Shot_sx4800 file is the raw seismic data of one shot. To visualize the seismic d
 
 suximage < Shot_sx4800 perc=98
 
-CIG4800 file is the Common Image Gather resulting from the application of the INTER and TRAD modules, as described in the paper.
+CIG4800 file is the Common Image Gather resulting from the application of the INTER and TRAD modules,
+as described in the paper Tinivella & Giustiniani (Computers & Geosciences).
  
 suximage < CIG4800 perc=98
 
