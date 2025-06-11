@@ -1,6 +1,6 @@
 # ISTRICI/CIG_V1 MANUAL: ***Software for the geological inversion of seismic data by using CIG analysis***
 
-Produced by Umberta Tinivella and michela Giustiniani (OGS)
+Produced by Umberta Tinivella and michela Giustiniani (OGS)  
 Rewritten by Lining Yang (CNR) 
 
 Please, after dowoading the software, write to utinivella@ogs.it and mgiustiniani@ogs.it to inform about it.
@@ -84,7 +84,7 @@ sh ISTRICI/CIG_V1/MakePicking
 Output: **horizon.dat, picks.dat, horizon_pick.dat** 
 
 **horizon.dat** is the interpolation of the performed picking.  
-**horizon.dat [X(distance) Z(depth)]**  
+**horizon.dat format:[X(distance) Z(depth)]**  
 Suggestion: before starting the folllowing step, change the name of horizon.dat 
 
 **horizon_pick.dat** is the file that can be used to visualise the picking in the seismic data by using the SU command, such as suximage and suxwigb.
