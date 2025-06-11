@@ -92,6 +92,10 @@ Suggestion: before starting the folllowing step, change the name of horizon.dat
 -----------------
 ## 4. Update of velocity field (vfile) by using CIG analysis
 
+<ins>This STEP needs to be revised.<ins>
+
+~Some INPUT files are missing~  
+
 Before starting this step, if you work on the first layer, it is necessary to create a file with information about its top. The file format has to be equal to horizon.dat in which the second column is equal to fz. For example, if fz=0 you can create the top file by using the following command:
 ```bash
 awk '{print $1,0}' filenamebottom >filenametop
