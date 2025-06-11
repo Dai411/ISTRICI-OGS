@@ -1,5 +1,6 @@
 echo "input files: kd.data_complete, outfile1_complete (after PerformPSDM)"
-pause
+
+read -p "Press Enter to continue..."
 
 echo "insert the firt cdp to extract and the step"
 read cdpin
