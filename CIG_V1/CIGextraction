@@ -2,7 +2,7 @@ echo "input files: kd.data_complete, outfile1_complete (after PerformPSDM)"
 
 pause
 
-echo "insert the firt cdp to extract and the step"
+echo "insert the first cdp to extract and the step"
 read cdpin
 read step
 
